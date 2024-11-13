@@ -1,0 +1,22 @@
+[
+    {
+        "question": "What does CPU stand for?",
+        "options": ["Central Processing Unit", "Central Programming Unit", "Computer Personal Unit", "Central Processor Unit"],
+        "answer": "Central Processing Unit"
+    },
+    {
+        "question": "Which of the following is an example of an input device?",
+        "options": ["Monitor", "Keyboard", "Printer", "Speakers"],
+        "answer": "Keyboard"
+    },
+    {
+        "question": "Which operating system is developed by Microsoft?",
+        "options": ["Linux", "MacOS", "Windows", "Android"],
+        "answer": "Windows"
+    },
+    {
+        "question": "What does RAM stand for?",
+        "options": ["Random Access Memory", "Read Access Memory", "Run All Memory", "Read And Memorize"],
+        "answer": "Random Access Memory"
+    }
+]

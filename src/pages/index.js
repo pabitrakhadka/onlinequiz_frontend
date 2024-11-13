@@ -1,115 +1,74 @@
-import Image from "next/image";
-import localFont from "next/font/local";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import React from "react";
+import Layout from "@/Components/Layout";
+import Head from "next/head";
+import ButtonComp from "@/Components/ButtonComp";
+import { FaAngleLeft } from "react-icons/fa6";
+import RadioComp from "@/Components/RadioComp";
+import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
-  return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const options = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+    { value: 'option3', label: 'Option 3' },
+    { value: 'option4', label: 'Option 4' },
+
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("");
+
+  const handleOptionChange = (event) => {
+    setSelectedOption(event.target.value);
+  };
+  return (
+    <>
+      <Head>
+        <title>Restaurant</title>
+        <meta name="description" content="Welcome to our restaurant!" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Layout>
+
+        <div className="home_screen  h-screen flex flex-col lg:flex-row items-center lg:items-start justify-between bg-blue-50 p-8 lg:p-16 space-y-6 lg:space-y-0 lg:space-x-10">
+          <div className="text-center lg:text-left max-w-xl space-y-4">
+            <h1 className="text-3xl lg:text-5xl font-bold text-blue-800">
+              Master Computer Skills with Our Online Computer Operator Quiz!
+            </h1>
+
+            <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
+              Ready to level up your computer skills? Our Computer Operator Online Quiz is designed to help you assess and enhance your knowledge in essential computer operations. Dive into a variety of topics, from basic software applications to advanced IT concepts, and track your progress with each quiz attempt. Whether you're preparing for a job, an exam, or simply looking to improve your computer expertise, this interactive quiz offers a fun and effective way to learn. Start today and unlock the skills you need to succeed in the digital world!
+            </p>
+            <div className="flex justify-center lg:justify-start">
+              <Link href={"/test"} className="text-white bg-blue-600 hover:bg-blue-700 text-2xl font-semibold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                Start Quiz
+              </Link>
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <img src="./computeroperator.png" alt="Computer Operator" className="w-full max-w-sm rounded-lg shadow-lg border border-gray-200" />
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <div>
+          <h1>Recents</h1>
+          <div className="flex justify-around ">
+            <div className="">
+              <h1>Sets</h1>
+            </div>
+            <div>
+              <h1>Subjective Questions</h1>
+            </div>
+            <div>
+              <h1>Past Question</h1>
+            </div>
+          </div>
+        </div>
+
+
+
+      </Layout>
+    </>
   );
 }
