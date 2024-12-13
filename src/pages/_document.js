@@ -5,6 +5,10 @@ export default function Document() {
     <Html lang="en">
       <Head />
       <body className="antialiased">
+        <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/tailspin.js"></script>
+
+
+
         <Main />
         <NextScript />
       </body>

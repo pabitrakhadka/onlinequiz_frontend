@@ -1,7 +1,7 @@
 import AlertMessage from '@/Components/AlertMessage';
 import ButtonComp from '@/Components/ButtonComp';
 import Layout from '@/Components/Layout';
-import { getQuiz } from '@/functions/adminapi/quiz';
+import { getQuiz } from '@/functions/quiz';
 import React, { useEffect, useState } from 'react';
 export async function getServerSideProps(context) {
     const { set } = context.query;

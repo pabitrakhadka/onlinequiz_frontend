@@ -1,10 +1,17 @@
 import Layout from '@/Components/Layout';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 const SubjectiveQuestion = () => {
     const items = Array.from({ length: 10 }, (_, index) => index + 1);
-    const clicked = () => {
-        console.log("Click");
+    const router = useRouter();
+    const handleNavigation = () => {
+        router.push({
+            pathname: '/subjectiveQuestion/', // Target page
+            query: {
+                title: 'Set 1',
+            },
+        });
     };
 
     return (
@@ -16,7 +23,7 @@ const SubjectiveQuestion = () => {
                     {items.map((item) => (
                         <div
                             key={item}
-                            onClick={clicked}
+                            onClick={handleNavigation}
                             className="bg-white shadow-lg rounded-lg p-6 hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 cursor-pointer"
                         >
                             <div className="image mb-4">

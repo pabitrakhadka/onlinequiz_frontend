@@ -1,7 +1,7 @@
 import ButtonComp from '@/Components/ButtonComp';
 import InputComp from '@/Components/InputComp';
 import Layout from '@/Components/Layout';
-import { loginSchema } from '@/Components/validate';
+import { loginSchema } from '@/validate';
 import { useFormik } from 'formik';
 import Link from 'next/link';
 import React, { useState } from 'react';

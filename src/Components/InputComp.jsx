@@ -1,6 +1,6 @@
 import React from 'react';
 
-const InputComp = ({ label = null, type = null, className, id, name, onChange, onBlur, value, ...props }) => {
+const InputComp = ({ label = null, type = "text", className, id, name, onChange, onBlur, value, ...props }) => {
     return (
 
         <>

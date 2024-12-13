@@ -1,24 +1,47 @@
-import React from 'react'
+import React from "react";
 
-const TextAreaComp = ({ value = null, name, onChange = null, onBlur, label = null, id, cols = 10, rows = 5, placeholder = null, ...props }) => {
+// TextAreaComp component
+const TextAreaComp = ({
+    value = "",
+    name,
+    onChange = () => { },
+    onBlur = () => { },
+    label = "",
+    id,
+    cols = 10,
+    rows = 5,
+    placeholder = "",
+    ...props
+}) => {
+    const textAreaId = id || name;
+
     return (
-        <>   <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="bulkText">
-            {label}
-        </label>
-            <textarea
+        <>
+            {/* Label for the textarea */}
+            {label && (
+                <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    htmlFor={textAreaId}
+                >
+                    {label}
+                </label>
+            )}
 
-                id={id}
+            {/* Textarea component */}
+            <textarea
+                id={textAreaId}
                 name={name}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
+                value={value} // Controlled value
+                onChange={onChange} // Handle change
+                onBlur={onBlur} // Handle blur
                 cols={cols}
                 rows={rows}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-50 resize-none"
                 placeholder={placeholder}
-                {...props}
-            /></>
-    )
-}
+                {...props} // Any additional props passed to the component
+            />
+        </>
+    );
+};
 
-export default TextAreaComp
+export default TextAreaComp;

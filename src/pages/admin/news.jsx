@@ -1,107 +1,231 @@
 import ButtonComp from '@/Components/ButtonComp';
-import DashLayout from '@/Components/DashLayout'
+import DashLayout from '@/Components/DashLayout';
 import InputComp from '@/Components/InputComp';
 import Modal from '@/Components/Model';
 import TextAreaComp from '@/Components/TextAreaComp';
 import { newsSchema } from '@/validate';
 import { useFormik } from 'formik';
-import ImageC from '../../../public/computeroperator.png';
-import React, { useState } from 'react'
-import CardComp from '@/Components/CardComp';
+import React, { useEffect, useState } from 'react';
+import CardNews from "@/Components/CardNews";
+
+import { toast } from 'react-toastify';
+import { DeleteNews, getNews, postNews, updateNews } from '@/functions/news';
 
 const initialValues = {
     heading: "",
-    description: ""
+    description: "",
+    image: null,
 };
-const news = () => {
 
-    const { values, touched, errors, handleBlur, handleChange, handleSubmit } = useFormik({
+import dynamic from 'next/dynamic';
+const Loders = dynamic(() => import("@/Components/Loders"), { ssr: false });
+const News = () => {
+
+    const [isNewsId, setNewsId] = useState(null);
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [imageFile, setImageFile] = useState(null); // Stores the selected file
+    const [loading, setLoading] = useState(true);
+
+    const { values, touched, errors, handleBlur, handleChange, handleSubmit, setFieldValue, resetForm } = useFormik({
         initialValues: initialValues,
         validationSchema: newsSchema,
         onSubmit: async (values) => {
             try {
+                if (!imageFile) {
+                    toast.error("Image is required.");
+                    return;
+                }
 
+                const formData = new FormData();
+                formData.append("heading", values.heading);
+                formData.append("description", values.description);
+                formData.append("image", imageFile);
+
+                // Determine whether to update or create new news
+                const res = isUpdate
+                    ? await updateNews(`id=${isNewsId}`, formData)
+                    : await postNews(formData);
+
+                if (res.status === 200) {
+                    console.log("Response data:", res.data);
+                    toast.success(res.data.message);
+
+                    // Reset form and clear image
+                    resetForm();
+                    setImageFile(null);
+
+                    // Close modal
+                    setModalOpen(false);
+                } else {
+                    toast.error(res.data.message || "An error occurred.");
+                }
             } catch (error) {
-
+                console.error("Form submission error:", error);
+                toast.error("An unexpected error occurred. Please try again.");
             }
+        },
+    });
 
-        }
-    })
-
-
-    const [isModalOpen, setModalOpen] = useState(false);
 
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
 
-    const [image, setImage] = useState('');
     const onImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
-            setImage(URL.createObjectURL(e.target.files[0]))
+            const file = e.target.files[0];
+            setImageFile(file); // Store the actual file for submission
+            setFieldValue("image", file); // Update formik's image field
+        }
+    };
+
+    useEffect(() => {
+        loadNews();
+    }, [])
+
+    const [newsData, setNewsdata] = useState([]);
+    const loadNews = async () => {
+        try {
+            const res = await getNews();
+            if (res.status === 200) {
+                console.log(res.data);
+
+                setNewsdata(res.data);
+                setLoading(false);
+            } else {
+                console.log("error");
+            }
+        } catch (error) {
+
         }
     }
-    // const toggleBulk = () => setBulk(!isBulk);
+
+
+    //this is DeleteNews Function
+    const handleDelete = async (id) => {
+        try {
+
+            const res = await DeleteNews(`id=${id}`);
+            if (res.status === 200) {
+                toast.success(`${res.data.message}`);
+                setNewsdata(newsData.filter((item) => item.id !== id));
+            } else {
+                toast.error(`${res.data.message}`)
+            }
+
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
+    //handleEdit 
+    const handleEdit = async (id) => {
+        try {
+            setIsUpdate(true);
+            const res = await getNews(`id=${id}`);
+            if (res.status === 200) {
+                console.log(res.data);
+                openModal(true);
+                setNewsId(id);
+                values.description = res.data.description;
+                values.heading = res.data.heading;
+
+
+            } else {
+                toast.error(`${res.data.message}`)
+            }
+
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
     return (
         <DashLayout>
-            <div>
-                <div className="">
-                    <ButtonComp onClick={openModal} name='Add News' />
-                </div>
-                <div className='flex'>
-                    <CardComp cardTitle={"This is Card Title"} isNews="true" descriptin={"This is Description hare.."} />
-                    <CardComp cardTitle={"This is Card Title"} isNews="true" descriptin={"This is Description hare.."} />
+            {loading ? <>
 
-                    {/* <div className="new_col">
-                        <div className="flex items-center">
+                <div>
+                    <Loders />
+                </div>
+
+            </> : <>
+
+                <div>
+                    <div className="">
+                        <ButtonComp onClick={openModal} name="Add News" />
+                    </div>
+                    <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                        {newsData && newsData.length > 0 ?
+                            newsData.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="max-w-sm w-full sm:w-[calc(50%-1rem)] md:w-[calc(33%-1rem)] bg-white rounded-lg shadow-md overflow-hidden"
+                                >
+                                    <CardNews
+
+                                        image={item.image}
+                                        cardTitle={item.heading}
+                                        isNews={true}
+                                        description={item.description}
+                                    />
+                                    <div className="mt-4 flex space-x-2 p-4">
+                                        <ButtonComp className="m-1" name="Edit" onClick={() => handleEdit(item.id)} />
+                                        <ButtonComp className="m-1" name="Delete" onClick={() => handleDelete(item.id)} />
+                                    </div>
+                                </div>
+                            )) : (
+
+                                <p>No News Found!</p>
+                            )}
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center min-h-screen ">
+                        <Modal isOpen={isModalOpen} onClose={closeModal} title="Add News">
                             <div>
-                                <img className='' src="https://cdn.britannica.com/77/170477-050-1C747EE3/Laptop-computer.jpg" height={200} width={200} alt="" />
+                                <form onSubmit={handleSubmit}>
+                                    <div className="image mb-4">
+                                        <input type="file" name="image" onChange={onImageChange} />
+                                        {imageFile && <img className='w-full h-48 object-contain p-2' alt="Preview" height={100} width={100} src={URL.createObjectURL(imageFile)} />}
+                                        {errors.image && touched.image && (
+                                            <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <InputComp
+                                            label="Heading"
+                                            type="text"
+                                            name="heading"
+                                            value={values.heading}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                        />
+                                        {errors.heading && touched.heading && (
+                                            <p className="text-red-500 text-sm mt-1">{errors.heading}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <TextAreaComp
+                                            label="Description"
+                                            name="description"
+                                            value={values.description}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="Enter description here..."
+                                        />
+                                        {errors.description && touched.description && (
+                                            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                                        )}
+                                    </div>
+                                    <div className="flex justify-around mt-4">
+                                        <ButtonComp onClick={closeModal} name="Close" />
+                                        <ButtonComp name={isUpdate ? "Update" : "Submit"} type="submit" />
+                                    </div>
+                                </form>
                             </div>
-                            <div>
-                                <h2 className='text-2xl font-bold '>Heading</h2>
-                            </div>
-                        </div>
-                    </div> */}
+                        </Modal>
+                    </div>
                 </div>
-                <div className="flex flex-col items-center justify-center min-h-screen ">
-
-                    {/* <button
-                            onClick={openModal}
-                            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700"
-                        >
-                            Open Modal
-                        </button> */}
-
-                    <Modal isOpen={isModalOpen} onClose={closeModal} title="Add News">
-                        <div>
-                            <form onSubmit={handleSubmit}>
-                                <div className="image ">
-                                    <input type="file" onChange={onImageChange} />
-                                    {image ? <>    <img alt='preview Image' height={100} width={100} src={image}></img></> : null}
-                                </div>
-                                <div>
-                                    <InputComp label={"Heading"} type={"text"} name={"heading"} value={values.heading} onChange={handleChange} onBlur={handleBlur} />
-                                    {errors.heading && touched.heading ? <><p className='text-red-500 text-sm mt-1'>{errors.heading}</p></> : null}
-                                </div>
-                                <div>
-                                    <TextAreaComp label={"Description"} name={"description"} value={values.description} onChange={handleChange} onBlur={handleBlur} placeholder={'Emter Description hare..'} />
-                                    {/* <InputComp label={"Description"} type={"text"} name={"description"} value={values.description} onChange={handleChange} onBlur={handleBlur} /> */}
-                                    {errors.description && touched.description ? <><p className='text-red-500 text-sm mt-1'>{errors.description}</p></> : null}
-                                </div>
-                                <div className='flex justify-around'>
-                                    <ButtonComp onClick={closeModal} name='Close' />
-                                    <ButtonComp name='Submit' type={"submit"} />
-                                </div>
-                            </form>
-
-
-                        </div>
-
-                    </Modal>
-                </div>
-
-            </div>
+            </>}
         </DashLayout>
-    )
-}
+    );
+};
 
-export default news
+export default News;
