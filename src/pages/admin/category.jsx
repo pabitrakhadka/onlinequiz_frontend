@@ -70,6 +70,7 @@ const category = () => {
     //Category Delete
     const deleteCategoryButton = async (id) => {
         try {
+            console.log("id", id);
             const res = await deleteCategory(id);
             if (res.status === 200) {
                 toast.success(`${res.data.message}`);

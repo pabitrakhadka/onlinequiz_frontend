@@ -21,9 +21,10 @@ const NewsDetail = () => {
 
     const loadNews = async (id) => {
         try {
-            const params = `?id=${id}`;
+            const params = `id=${id}`;
             const res = await getNews(params);
             if (res.status === 200) {
+                console.log(res.data);
                 setNewsData(res.data);
                 setLoading(false)
             }

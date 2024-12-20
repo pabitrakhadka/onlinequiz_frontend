@@ -14,6 +14,8 @@ import FileInputComp from '@/Components/FileInputComp';
 import { getCategories } from '@/functions/category';
 import SelectOption from '@/Components/SelectOption';
 import { DeleteQuiz, getQuiz, postQuiz, UpdateQuiz } from '@/functions/quiz';
+import Pagination from '@/Components/Pagination';
+import Papa from "papaparse";
 const initialValues = {
     question: "",
     option1: "",
@@ -33,15 +35,16 @@ const quiz = () => {
     //this edit quiz quesion and delete quesion 
     const editQuestion = async (id) => {
         try {
+            console.log("id=", id);
             setEditID(id);
             setEdit(true);
 
-            const res = await getQuiz(`id=${id}`);
+            const res = await getQuiz(`quizId=${id}`);
 
 
             if (res.status === 200) {
-                console.log("datatadf=", res.data);
-                const data = res.data[0];
+                console.log("Edit id=", res.data);
+                const data = res.data.data;
                 values.question = data.question;
                 values.description = data.description;
                 values.answer = data.answer;
@@ -79,13 +82,16 @@ const quiz = () => {
         }
     }
     const [categoryData, setCategoryData] = useState([]);
-    const [category, setcategory] = useState(5);
+    const [category, setcategory] = useState(1);
     const [questionData, setQuestion] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [isBulk, setBulk] = useState(false);
 
     const openModal = () => setModalOpen(true);
-    const closeModal = () => setModalOpen(false);
+    const closeModal = () => {
+        setModalOpen(false);
+        setJsonData(null);
+    }
     const toggleBulk = () => setBulk(!isBulk);
 
     const [bulkData, setBulkData] = useState(""); // Initialize as an empty string
@@ -98,6 +104,7 @@ const quiz = () => {
     const submitBulkData = async (e) => {
         e.preventDefault();
         try {
+            console.log("fiel=", jsondData);
             const formattedData = jsondData.map((data) => ({
                 question: data.question,
                 options: [
@@ -171,16 +178,26 @@ const quiz = () => {
             }
         }
     });
+    //pagination Locin
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1)
+
+    //Handle Page Change
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
 
     //load question
     const loadQuestion = async (category) => {
         try {
-
+            console.log("totalPages=", totalPages);
+            console.log("currentPage=", currentPage);
             console.log("category=", category);
-            const res = await getQuiz(`category=${category}`);
+            const res = await getQuiz(`page=${currentPage}&categoryId=${category}`);
             if (res.status === 200) {
-                console.log("res=", res.data.data);
+
                 setQuestion(res.data.data);
+                setTotalPages(res.data.totalPages);
             } else {
                 console.log("error");
             }
@@ -210,13 +227,13 @@ const quiz = () => {
             loadQuestion(category);
         }
 
-    }, [category])
+    }, [category, currentPage])
     useEffect(() => {
         loadCategory();
     }, [])
 
     const [jsondData, setJsonData] = useState(null);
-    //make a method
+
     const excelFileUpload = (e) => {
         const file = e.target.files[0];
         if (!file) {
@@ -249,6 +266,8 @@ const quiz = () => {
 
         reader.readAsBinaryString(file);
     };
+
+
     return (
         <DashLayout>
             <div className="">
@@ -263,7 +282,7 @@ const quiz = () => {
                     </div>
 
 
-                    <div className="relative overflow-scroll shadow-md sm:rounded-lg h-screen">
+                    <div className="relative overflow-scroll ">
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
@@ -321,11 +340,12 @@ const quiz = () => {
 
                             </tbody>
                         </table>
+                        <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={totalPages} />
                     </div>
 
 
 
-                    <div className="flex flex-col items-center justify-center min-h-screen ">
+                    <div className="">
                         {/* <button
                             onClick={openModal}
                             className="px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700"

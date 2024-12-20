@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FileInputComp = ({ id = '', onChange, className = '' }) => {
+const FileInputComp = ({ id = '', onChange, className = '', accept = null, name }) => {
     return (
         <div className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-md">
             <div className="flex items-center justify-center w-full">
@@ -25,13 +25,14 @@ const FileInputComp = ({ id = '', onChange, className = '' }) => {
                             ></path>
                         </svg>
                         <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-                        <p className="text-xs text-gray-500">.xlsx, .xls only</p>
+                        <p className="text-xs text-gray-500">{accept}</p>
                     </div>
                     <input
                         id={`file-upload-${id}`}
                         type="file"
                         className="hidden"
-                        accept=".xlsx,.xls"
+                        accept={accept}
+                        name={name}
                         onChange={onChange}
                     />
                 </label>

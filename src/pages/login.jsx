@@ -1,24 +1,47 @@
 import ButtonComp from '@/Components/ButtonComp';
 import InputComp from '@/Components/InputComp';
 import Layout from '@/Components/Layout';
+import AuthContext from '@/Context/context';
+import { postLogin } from '@/functions/user';
 import { loginSchema } from '@/validate';
 
 import { useFormik } from 'formik';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { useContext } from 'react';
+
+
+// import { seLocalStorage } from '@/services/localStorage';
+
 const initialValues = {
     email: "",
     password: ""
 }
 const Login = () => {
+    const { login, isLoggedIn } = useContext(AuthContext);
 
-
+    const router = useRouter();
     const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
         initialValues: initialValues,
         validationSchema: loginSchema,  // Correct this to validationSchema
         onSubmit: async (values) => {
             try {
-                // Handle form submission
+                const res = await postLogin(values);
+                if (res.status === 200) {
+                    alert(res.data.message);
+                    console.log(res.data.data);
+                    // login(res.data.data);
+                    // isLoggedIn(false);
+                    // seLocalStorage("userData", res.data.data);
+                    login(res.data.data);
+                    isLoggedIn();
+
+                    router.push('/');
+
+                } else {
+                    alert(res.data.message);
+                }
             } catch (error) {
                 console.error("Error submitting form:", error);
             }
@@ -68,6 +91,7 @@ const Login = () => {
 
                         <div className='flex justify-center mt-6'>
                             <ButtonComp
+                                type={"submit"}
                                 name='Login'
                                 className="w-full bg-indigo-500 text-white py-2 px-6 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75"
                             />

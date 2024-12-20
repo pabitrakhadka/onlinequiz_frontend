@@ -34,14 +34,30 @@ const registerSchema = Yup.object().shape({
         .min(3, "Too Short!")
         .max(50, "Too Long!")
         .required("Required"),
+    password: Yup.string()
+        .min(4, "Password must be at least 8 characters")
+        .max(32, "Password cannot exceed 32 characters")
+        .matches(
+            /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{4,}$/,
+            "Password must contain at least one letter and one number"
+        )
+        .required("Password is required"),
+    confirm_password: Yup.string()
+        .oneOf([Yup.ref('password'), null], "Passwords must match")
+        .required("Confirm Password is required"),
 });
+
 // Login Schema
 const loginSchema = Yup.object().shape({
     email: EmailValidate(),
     password: Yup.string()
-        .min(6, "Too Short!")
-        .max(50, "Too Long!")
-        .required("Required"),
+        .min(8, "Password must be at least 8 characters")
+        .max(32, "Password cannot exceed 32 characters")
+        .matches(
+            /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/,
+            "Password must contain at least one letter and one number"
+        )
+        .required("Password is required"),
 });
 //Quiz Schema
 const quizSchema = Yup.object().shape({
@@ -65,16 +81,17 @@ const newsSchema = Yup.object().shape({
     description: Yup.string()
         .required("Description is required"),
     image: Yup.mixed()
-        .required("Image is required")
+        .nullable()  // Allow null value
+        .required("Image is required")  // Ensure the file is uploaded if not null
         .test(
             "fileSize",
             "File size is too large. Maximum size is 5MB",
-            (value) => !value || (value && value.size <= FILE_SIZE)
+            (value) => !value || (value && value.size <= FILE_SIZE)  // Validate file size
         )
         .test(
             "fileFormat",
             "Unsupported file format",
-            (value) => !value || (value && SUPPORTED_FORMATS.includes(value.type))
+            (value) => !value || (value && SUPPORTED_FORMATS.includes(value.type))  // Validate file format
         ),
 });
 
@@ -113,5 +130,11 @@ const categorySchema = Yup.object().shape({
     categoryName: Yup.string().required("Required"),
 });
 
+const slugSchema = Yup.object().shape(
+    {
+        title: stringMessageValidate(),
+        description: stringMessageValidate(),
+    }
+)
 // Export Schemas
-export { registerSchema, loginSchema, quizSchema, newsSchema, pdfValidationSchema, contactSchema, subjectiveQuestionSchema, categorySchema };
+export { registerSchema, loginSchema, quizSchema, newsSchema, pdfValidationSchema, contactSchema, subjectiveQuestionSchema, categorySchema, slugSchema };

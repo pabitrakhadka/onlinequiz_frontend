@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Toast from "./Toast";
-import { Book, Home, MessageCircle } from 'iconsax-react';
+import { Book, Home, MessageCircle, Image } from 'iconsax-react';
 import { FaFilePdf, FaNewspaper } from "react-icons/fa6";
 import { FiFileText } from "react-icons/fi";
 
@@ -17,6 +17,7 @@ const DashLayout = ({ children }) => {
         { name: "Messages", to: "/admin/message", icon: <MessageCircle size="24" /> },
         { name: "User Score", to: "/admin/userScrore", icon: <MessageCircle size="24" /> },
         { name: "Category", to: "/admin/category", icon: <MessageCircle size="24" /> },
+        { name: "Slider", to: "/admin/slider", icon: <Image size="24" /> },
         { name: "Logout", to: "/admin/category", icon: <MessageCircle size="24" /> },
 
 
@@ -44,14 +45,14 @@ const DashLayout = ({ children }) => {
 
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col">
+            <div className="h-screen overflow-hidden w-full">
                 {/* Header */}
                 <header className="bg-blue-700 text-white p-4 md:hidden">
                     <h2 className="text-xl font-bold">Dashboard</h2>
                 </header>
 
                 {/* Main Content */}
-                <main className="flex-1 p-4 bg-gray-100">
+                <main className="flex-1 p-4 bg-gray-100 h-screen overflow-hidden overflow-y-auto">
                     {children}
                 </main>
 

@@ -4,7 +4,7 @@ class Server {
         this.header = {}
     }
     post(path, data) {
-        return axios.post(path, data, {
+        return axios.post(path, data, { withCredentials: true }, {
             headers: this.header
         })
     }

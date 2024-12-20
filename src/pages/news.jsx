@@ -5,10 +5,20 @@ import { getNews } from '@/functions/news';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { timeAgo } from '@/services/timeAgo';
+import Pagination from '@/Components/Pagination';
 const Loders = dynamic(() => import('@/Components/Loders'), { ssr: false })
 const news = () => {
     const [loading, setLoading] = useState(true);
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(10);
 
+
+    //handle buttuon click
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    }
     const router = useRouter();
     const [articles, setarticles] = useState([]);
     useEffect(() => {
@@ -21,8 +31,10 @@ const news = () => {
         try {
             const res = await getNews("");
             if (res.status === 200) {
-                setarticles(res.data);
+                setarticles(res.data.data);
+                console.log("res new data=", res.data);
                 setLoading(false);
+                setTotalPage(res.data.totalPage);
             }
         } catch (error) {
             console.log(error)
@@ -52,16 +64,18 @@ const news = () => {
                                 <img src={`${process.env.NEXT_PUBLIC_API_URL}/upload/images/${article.image}`} alt={""} className="w-full h-48 object-cover" />
                                 <div className="p-6">
                                     <h2 className="text-2xl font-semibold text-gray-800 mb-2">{article.heading}</h2>
-                                    <p className="text-gray-600 text-sm mb-4">{article.date}</p>
+                                    <p className="text-gray-600 text-sm mb-4">{timeAgo(article.createdAt)}</p>
                                     <p className="text-gray-700 mb-4">
                                         {article.description.split(" ").slice(0, 10).join(" ")}...
                                     </p>
-                                    <ButtonComp onClick={() => handleButtonClick(article.id)} name='Read More →' className="text-blue-600 font-semibold hover:underline"></ButtonComp>
+                                    <ButtonComp isPositive={true} onClick={() => handleButtonClick(article.id)} name='Read More →' className="text-blue-600 font-semibold hover:underline"></ButtonComp>
                                 </div>
                             </div>
                         ))}
                     </div></>}
-
+                <div>
+                    <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={totalPage} />
+                </div>
             </div>
         </Layout>
     );

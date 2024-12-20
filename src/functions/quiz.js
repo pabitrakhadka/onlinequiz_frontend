@@ -6,6 +6,7 @@ const QUIZAPI = "/api/quiz"
 
 //Get Quiz or Question
 export async function getQuiz(data) {
+    console.log('data=', data);
     return await server.get(getURL(`${QUIZAPI}?${data}`))
 }
 //Post Quiz

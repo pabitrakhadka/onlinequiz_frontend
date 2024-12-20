@@ -18,6 +18,8 @@ const initialValues = {
 };
 
 import dynamic from 'next/dynamic';
+import FileInputComp from '@/Components/FileInputComp';
+import Pagination from '@/Components/Pagination';
 const Loders = dynamic(() => import("@/Components/Loders"), { ssr: false });
 const News = () => {
 
@@ -26,6 +28,16 @@ const News = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [imageFile, setImageFile] = useState(null); // Stores the selected file
     const [loading, setLoading] = useState(true);
+
+    //pagination
+    const [totalPage, setTotalPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    //handlleNextPage
+    const handleNextPage = (page) => {
+        console.log(page);
+        setCurrentPage(page);
+    }
 
     const { values, touched, errors, handleBlur, handleChange, handleSubmit, setFieldValue, resetForm } = useFormik({
         initialValues: initialValues,
@@ -48,9 +60,10 @@ const News = () => {
                     : await postNews(formData);
 
                 if (res.status === 200) {
-                    console.log("Response data:", res.data);
+                    console.log("Response data:", res.data[0]);
                     toast.success(res.data.message);
 
+                    // setNewsdata((pre) => [pre, res.data]);
                     // Reset form and clear image
                     resetForm();
                     setImageFile(null);
@@ -69,7 +82,12 @@ const News = () => {
 
 
     const openModal = () => setModalOpen(true);
-    const closeModal = () => setModalOpen(false);
+    const closeModal = () => {
+        setModalOpen(false);
+        values.description = "";
+        values.heading = "";
+        values.image = "";
+    }
 
     const onImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -90,7 +108,8 @@ const News = () => {
             if (res.status === 200) {
                 console.log(res.data);
 
-                setNewsdata(res.data);
+                setNewsdata(res.data.data);
+                setTotalPage(res.data.totalPage);
                 setLoading(false);
             } else {
                 console.log("error");
@@ -128,6 +147,9 @@ const News = () => {
                 setNewsId(id);
                 values.description = res.data.description;
                 values.heading = res.data.heading;
+                values.image = res.data.image;
+                const url = `${process.env.NEXT_PUBLIC_API_URL}/upload/images`;
+                // setImageFile();
 
 
             } else {
@@ -152,37 +174,42 @@ const News = () => {
                     <div className="">
                         <ButtonComp onClick={openModal} name="Add News" />
                     </div>
-                    <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                        {newsData && newsData.length > 0 ?
-                            newsData.map((item, index) => (
-                                <div
-                                    key={index}
-                                    className="max-w-sm w-full sm:w-[calc(50%-1rem)] md:w-[calc(33%-1rem)] bg-white rounded-lg shadow-md overflow-hidden"
-                                >
-                                    <CardNews
+                    <div>
+                        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                            {newsData && newsData.length > 0 ?
+                                newsData.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="max-w-sm w-full sm:w-[calc(50%-1rem)] md:w-[calc(33%-1rem)] bg-white rounded-lg shadow-md overflow-hidden"
+                                    >
+                                        <CardNews
 
-                                        image={item.image}
-                                        cardTitle={item.heading}
-                                        isNews={true}
-                                        description={item.description}
-                                    />
-                                    <div className="mt-4 flex space-x-2 p-4">
-                                        <ButtonComp className="m-1" name="Edit" onClick={() => handleEdit(item.id)} />
-                                        <ButtonComp className="m-1" name="Delete" onClick={() => handleDelete(item.id)} />
+                                            image={item.image}
+                                            cardTitle={item.heading}
+                                            isNews={true}
+                                            description={item.description}
+                                        />
+                                        <div className="mt-4 flex space-x-2 p-4">
+                                            <ButtonComp isPositive={false} className="m-1" name="Edit" onClick={() => handleEdit(item.id)} />
+                                            <ButtonComp className="m-1" name="Delete" onClick={() => handleDelete(item.id)} />
+                                        </div>
                                     </div>
-                                </div>
-                            )) : (
+                                )) : (
 
-                                <p>No News Found!</p>
-                            )}
+                                    <p>No News Found!</p>
+                                )}
+
+                        </div>
+                        <div><Pagination currentPage={currentPage} onPageChange={handleNextPage} totalPages={totalPage} /></div>
                     </div>
+
 
                     <div className="flex flex-col items-center justify-center min-h-screen ">
                         <Modal isOpen={isModalOpen} onClose={closeModal} title="Add News">
                             <div>
                                 <form onSubmit={handleSubmit}>
                                     <div className="image mb-4">
-                                        <input type="file" name="image" onChange={onImageChange} />
+                                        <FileInputComp name={'image'} onChange={onImageChange} accept={'.jpg,.jpeg,.png'} />
                                         {imageFile && <img className='w-full h-48 object-contain p-2' alt="Preview" height={100} width={100} src={URL.createObjectURL(imageFile)} />}
                                         {errors.image && touched.image && (
                                             <p className="text-red-500 text-sm mt-1">{errors.image}</p>
@@ -215,7 +242,7 @@ const News = () => {
                                         )}
                                     </div>
                                     <div className="flex justify-around mt-4">
-                                        <ButtonComp onClick={closeModal} name="Close" />
+                                        <ButtonComp isPositive={false} onClick={closeModal} name="Close" />
                                         <ButtonComp name={isUpdate ? "Update" : "Submit"} type="submit" />
                                     </div>
                                 </form>

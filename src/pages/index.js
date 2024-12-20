@@ -80,7 +80,7 @@ export default function Home() {
 
           {/* leaboard */}
           <div className="leadboard h-screen w-full bg-indigo-500 ">
-            <h1 className="p-3 font-bold text-center text-white font-bold text-4xl">Leaderboard </h1>
+            <h1 className="p-3 font-bold text-center text-white font-bold text-4xl">Set Wise Leaderboard </h1>
 
             <div className="flex justify-around">
               <Leaderboard userName={"Pabitra Khadka"} rank={1} />

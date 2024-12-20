@@ -14,11 +14,13 @@ const SubjectiveQuestion = () => {
     const loadPdfFile = async () => {
         try {
 
-            const res = await getPdfQuestions(`category=${title}`);
-            if (res.status === 200 && res.data?.data?.fileName) {
-                const fileUrl = res.data.data.fileName;
-                console.log('Loaded PDF URL:', fileUrl);
-                setPdfFile(fileUrl);
+            const res = await getPdfQuestions(`id=${title}`);
+            if (res.status === 200) {
+
+                console.log("File=",);
+                // const fileUrl = res.data.data.fileName;
+                // console.log('Loaded PDF URL:', fileUrl);
+                setPdfFile(res.data.data[0].fileName);
 
             } else {
                 console.error('PDF file not found in response.');

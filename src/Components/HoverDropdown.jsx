@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 import ButtonComp from './ButtonComp';
 import { useRouter } from 'next/navigation';
 
-const HoverDropdown = ({ isMcq = null, onclick, isShow = null, label, items }) => {
+
+const HoverDropdown = ({ isMcq = null, onclick, isShow = null, label, items, className }) => {
+
 
 
     const router = useRouter();
@@ -19,14 +21,15 @@ const HoverDropdown = ({ isMcq = null, onclick, isShow = null, label, items }) =
     };
 
     return (
-        <div className='relative inline-block z-10' onClick={onclick} >
-            <ButtonComp name={label} className='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600' />
+        <div className='relative inline-block z-10 cursor-pointer' onClick={onclick} >
+            <p className={`${className}`}>{label}</p>
             {isShow && (
                 <div className='absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg'>
                     {items.map((item, index) => (
+
                         <div key={index} className='px-4 py=2'>
-                            <div onClick={() => clicked(item.main, isMcq)} className='font-semibold cursor-pointer hover:bg-gray-100 rounded-md px-2 py-1'>
-                                {item.main}
+                            <div onClick={() => clicked(item.id, isMcq)} className='font-semibold cursor-pointer hover:bg-gray-100 rounded-md px-2 py-1'>
+                                {item.categoryName}
                             </div>
                             {item.subItems && (
                                 <div className='ml-4 mt-1'>
