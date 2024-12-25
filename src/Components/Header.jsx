@@ -8,9 +8,20 @@ import UserIconLogo from "./UserIconLogo";
 import { getCategories } from "@/functions/category";
 import { useEffect } from "react";
 import ProfileCard from "./User/ProfileCard";
+import { useContext } from "react";
+
+import UserAuthContext from "@/Context/context";
 
 const Header = () => {
+    const { user, loading } = useContext(UserAuthContext);
 
+    if (loading) {
+        return <p>Loading...</p>;  // Show loading state while the authentication status is being checked
+    }
+
+    if (!user) {
+        return <p>Please log in to access this page.</p>;  // Show this message if no user is authenticated
+    }
     const [categoryData, setCategoryData] = useState([]);
     const [showPopover, setShowPopover] = useState(false);
 
@@ -29,20 +40,20 @@ const Header = () => {
     const handleCLickButton = () => {
 
         isClose(pre => !pre)
-        console.log("value=", isShow);
+        // console.log("value=", isShow);
 
     }
     const [isOpernSubjective, isCloseSubjective] = useState(!true);
     const handleSubjective = () => {
         isCloseSubjective(pre => !pre);
-        console.log(isOpernSubjective);
+        // console.log(isOpernSubjective);
     }
 
     const LoadCategoryData = async () => {
         try {
             const res = await getCategories(`category=notset`);
             if (res.status === 200) {
-                console.log(res.data.data);
+                // console.log(res.data.data);
                 setCategoryData(res.data.data);
             } else {
 
@@ -65,7 +76,7 @@ const Header = () => {
             <div className="flex items-center">
                 <div className="logo">
                     <Link href="/">
-                        <img src="./logo.png" height={50} width={50} alt="Logo" />
+                        <img src={`http://localhost:3001/log.png`} height={50} width={50} alt="Logo" />
                     </Link>
                 </div>
             </div>
@@ -96,9 +107,9 @@ const Header = () => {
                     <li className="  relative text-blue-700  ">
                         <Link className="text-gray-800 hover:text-blue-600" href="/Sets">Sets</Link>
                     </li>
-                    <li className="  relative text-slate-900 ">
+                    {/* <li className="  relative text-slate-900 ">
                         <Link className="text-gray-800 hover:text-blue-600" href="/pastquestion">Past Question Paper</Link>
-                    </li>
+                    </li> */}
                     <li className="  relative text-slate-900 ">
                         <HoverDropdown className="" onclick={() => handleCLickButton()} isMcq={"true"} isShow={isShow} label={" MCQ"} items={categoryData} />
                         {/* <Link class href="/notes">Mcq/Chapter Wise</Link> */}
@@ -113,30 +124,32 @@ const Header = () => {
                     <li className="px-4 py-2 rounded-md hover:bg-blue-100">
                         <Link className="text-gray-800 hover:text-blue-600" ass href="/news">News/Blog</Link>
                     </li>
-                    <li className="px-4 py-2 rounded-md hover:bg-blue-100">
-                        <Link className="text-gray-800 hover:text-blue-600" href="/login">Login</Link>
-                    </li>
-                    {/* <li className="px-4 py-2 rounded-md hover:bg-blue-100">
-                        <Link className="text-gray-800 hover:text-blue-600" href="/logout">Logout</Link>
-                    </li> */}
-                    <li className="relative text-slate-900  ">
+                    {
+                        user?.id ? <>
+                            <div className="relative text-slate-900">
+                                {/* Button */}
+                                <ButtonComp onClick={togglePopover} name={"User Profile"} />
 
-                    </li>
-                    <div className="relative text-slate-900">
-                        {/* Button */}
-                        <ButtonComp onClick={togglePopover} name={"User Profile"} />
+                                {showPopover ? <>
+                                    <div className=" ">
 
-                        {showPopover ? <>
-                            <div className=" ">
+                                        <ProfileCard />
 
-                                <ProfileCard />
+                                    </div>
+                                </> : null}
 
-                            </div>
-                        </> : null}
+                                {/* Popover */}
 
-                        {/* Popover */}
+                            </div></> : <>
+                            <li className="px-4 py-2 rounded-md hover:bg-blue-100">
+                                <Link className="text-gray-800 hover:text-blue-600" href="/login">Login</Link>
+                            </li>
+                        </>
+                    }
 
-                    </div>
+
+
+
                 </ul>
             </div>
         </header>

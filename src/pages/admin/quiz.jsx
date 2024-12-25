@@ -16,6 +16,8 @@ import SelectOption from '@/Components/SelectOption';
 import { DeleteQuiz, getQuiz, postQuiz, UpdateQuiz } from '@/functions/quiz';
 import Pagination from '@/Components/Pagination';
 import Papa from "papaparse";
+import ToggleButton from '@/Components/ToggleButton';
+import { Button } from '@react-pdf-viewer/core';
 const initialValues = {
     question: "",
     option1: "",
@@ -25,11 +27,19 @@ const initialValues = {
     categoryId: "",
     answer: "",
     description: ""
+
 }
 const quiz = () => {
 
+    const [toggleButton, setToggleButton] = useState(false);
+
+    const handelToagelButton = () => {
+        console.log(toggleButton);
+        setToggleButton(!toggleButton)
+    }
     const [isEdit, setEdit] = useState(false);
     const [editId, setEditID] = useState(null);
+    const [isCsv, setCsv] = useState(false);
 
 
     //this edit quiz quesion and delete quesion 
@@ -43,16 +53,22 @@ const quiz = () => {
 
 
             if (res.status === 200) {
-                console.log("Edit id=", res.data);
                 const data = res.data.data;
+                console.log("data=", res.data.data);
+                console.log("Questin=", data?.question)
                 values.question = data.question;
                 values.description = data.description;
                 values.answer = data.answer;
-                values.categoryId = data.categoryId;
-                values.option1 = data?.options[0]?.text;
-                values.option2 = data?.options[1]?.text;
-                values.option3 = data?.options[2]?.text;
-                values.option4 = data?.options[3]?.text;
+                values.categoryId = data.categoryId; // Check if options exist before accessing them 
+                if (data?.options?.length > 0) {
+                    values.option1 = data.options[0]?.text;
+                    values.option2 = data.options[1]?.text;
+                    values.option3 = data.options[2]?.text;
+                    values.option4 = data.options[3]?.text;
+                } else {
+                    console.error("No options found in the data.");
+
+                }
                 openModal();
 
 
@@ -92,6 +108,16 @@ const quiz = () => {
         setModalOpen(false);
         setJsonData(null);
     }
+    const [apiModelOpen, setApiModalOpen] = useState(false);
+
+    const IsOpenApiModal = () => {
+
+        setApiModalOpen(true);
+    }
+    const closeApiModal = () => {
+        setApiModalOpen(false);
+    }
+
     const toggleBulk = () => setBulk(!isBulk);
 
     const [bulkData, setBulkData] = useState(""); // Initialize as an empty string
@@ -104,31 +130,81 @@ const quiz = () => {
     const submitBulkData = async (e) => {
         e.preventDefault();
         try {
-            console.log("fiel=", jsondData);
-            const formattedData = jsondData.map((data) => ({
-                question: data.question,
-                options: [
-                    data.option1,
-                    data.option2,
-                    data.option3,
-                    data.option4,
-                ],
-                categoryId: data.categoryId,
-                answer: data.answer,
-                description: data.description
-            }));
+            if (toggleButton) {
+                console.log("fiel=", jsondData);
+                const formattedData = jsondData.map((data) => ({
+                    question: data.question,
+                    options: [
+                        data.option1,
+                        data.option2,
+                        data.option3,
+                        data.option4,
+                    ],
+                    categoryId: data.categoryId,
+                    answer: data.answer,
+                    description: data.description
+                }));
 
-            setBulkData(formattedData);
-            console.log("formattedData=", formattedData);
+                setBulkData(formattedData);
 
+                const response = await postQuiz(formattedData);
+                if (response.status === 200) {
+                    toast.success("Data uploaded successfully!");
+                    closeModal();
+                } else {
+                    toast.error("Failed to upload data.");
+                }
 
-            const response = await postQuiz(formattedData);
-            if (response.status === 200) {
-                toast.success("Data uploaded successfully!");
-                closeModal();
             } else {
-                toast.error("Failed to upload data.");
+
+                const response = await postQuiz(jsondData);
+                if (response.status === 200) {
+                    toast.success("Data uploaded successfully!");
+                    closeModal();
+                } else {
+                    toast.error("Failed to upload data.");
+                }
+
             }
+
+
+
+
+
+        } catch (error) {
+            console.error(error);
+            toast.error("An error occurred while submitting data.");
+        }
+    };
+
+    const submitJsonData = async (e) => {
+        e.preventDefault();
+        try {
+            console.log("fiel=", jsondData);
+            // const formattedData = jsondData.map((data) => ({
+            //     question: data.question,
+            //     options: [
+            //         data.option1,
+            //         data.option2,
+            //         data.option3,
+            //         data.option4,
+            //     ],
+            //     categoryId: data.categoryId,
+            //     answer: data.answer,
+            //     description: data.description
+            // }));
+
+            // setBulkData(formattedData);
+            // console.log("formattedData=", formattedData);
+
+
+            // const response = await postQuiz(formattedData);
+            // if (response.status === 200) {
+            //     toast.success("Data uploaded successfully!");
+            //     closeModal();
+            // } else {
+            //     toast.error("Failed to upload data.");
+            // }
         } catch (error) {
             console.error(error);
             toast.error("An error occurred while submitting data.");
@@ -235,36 +311,93 @@ const quiz = () => {
     const [jsondData, setJsonData] = useState(null);
 
     const excelFileUpload = (e) => {
+
         const file = e.target.files[0];
         if (!file) {
             alert("Please select a file.");
             return;
         }
+        if (toggleButton) {
+            const reader = new FileReader();
 
-        const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = event.target.result;
+                    // Parse the Excel file
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    // Get the first sheet name
+                    const worksheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[worksheetName];
+                    // Convert worksheet to JSON
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+                    console.log(json); // For debugging
+                    setJsonData(json); // Replace with your state update logic
+                } catch (error) {
+                    console.error("Error parsing file:", error);
+                }
+            };
 
-        reader.onload = (event) => {
-            try {
-                const data = event.target.result;
-                // Parse the Excel file
-                const workbook = XLSX.read(data, { type: 'binary' });
-                // Get the first sheet name
-                const worksheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[worksheetName];
-                // Convert worksheet to JSON
-                const json = XLSX.utils.sheet_to_json(worksheet);
-                console.log(json); // For debugging
-                setJsonData(json); // Replace with your state update logic
-            } catch (error) {
-                console.error("Error parsing file:", error);
-            }
-        };
+            reader.onerror = (error) => {
+                console.error("File reading error:", error);
+            };
 
-        reader.onerror = (error) => {
-            console.error("File reading error:", error);
-        };
+            reader.readAsBinaryString(file);
 
-        reader.readAsBinaryString(file);
+
+        } else {
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                try {
+                    const data = event.target.result;
+
+                    Papa.parse(data, {
+                        complete: (result) => {
+                            console.log(result); // Debugging the raw parsed data
+
+                            // Filter out empty rows
+                            const filteredData = result.data.filter((row) => {
+                                // Check if any value in the row is non-empty
+                                return Object.values(row).some((value) => value !== null && value !== undefined && value !== '');
+                            });
+
+                            // Transform the data to format options and ensure categoryId is a number
+                            const formattedData = filteredData.map((row) => {
+                                // Format the options field as an array
+                                const options = row.options
+                                    ? row.options.split(';').map((opt) => opt.trim())
+                                    : [];
+
+                                // Ensure categoryId is a number, parse or default to null
+                                const categoryId = Number(row.categoryId);
+
+                                return {
+                                    ...row,
+                                    options, // Format options as an array
+                                    categoryId: isNaN(categoryId) ? null : categoryId, // Set categoryId as a number or null
+                                };
+                            });
+
+                            console.log(formattedData); // Debugging the formatted data
+                            setJsonData(formattedData); // Save the transformed CSV data
+                        },
+                        header: true, // Set to true if CSV has headers
+                    });
+                } catch (error) {
+                    console.error("Error parsing file:", error);
+                }
+            };
+
+            reader.onerror = (error) => {
+                console.error("File reading error:", error);
+            };
+
+            reader.readAsText(file);
+
+
+
+        }
+
     };
 
 
@@ -275,12 +408,46 @@ const quiz = () => {
                     <div className='flex justify-around items-center'>
                         <div className="">
                             <ButtonComp onClick={openModal} name='Add Quiz' />
+                            <ButtonComp onClick={IsOpenApiModal} name='Add Question Through Api' />
                         </div>
                         <div className="">
                             <SearchComp />
                         </div>
                     </div>
+                    <Modal isOpen={apiModelOpen} title={"Add Questin Through Api"} onClose={closeApiModal}>
+                        <form onSubmit={submitJsonData} className="space-y-4">
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-1">
+                                        <InputComp
+                                            value={'http://localhost:3000/api/superadmin?spassword=DROWSSA'}
+                                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                        />
+                                    </div>
 
+                                    <div>
+                                        <ButtonComp
+                                            type={'submit'}
+                                            name={"Submit"}
+                                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <TextAreaComp
+                                        name="questions"
+                                        value={jsondData}
+                                        id="bulkText"
+                                        label="Bulk Questions"
+                                        placeholder="JSON Data will appear here..."
+                                        className="w-full p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                </div>
+                            </div>
+                        </form>
+
+                    </Modal>
 
                     <div className="relative overflow-scroll ">
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -355,7 +522,8 @@ const quiz = () => {
 
                         <Modal isOpen={isModalOpen} onClose={closeModal} title="Add Question">
                             <div>
-                                <div className='flex justify-end'>
+                                <div className='flex justify-center'>
+
                                     <button
                                         onClick={toggleBulk}
                                         className={`px-6 py-3 rounded font-semibold text-white transition ${isBulk ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
@@ -363,14 +531,21 @@ const quiz = () => {
                                     >
                                         {isBulk ? "Bulk Mode On" : "Bulk Mode Off"}
                                     </button>
+
+
                                 </div>
                                 <form onSubmit={isBulk ? submitBulkData : handleSubmit} action="">
                                     <div>
                                         {isBulk ? <>
+                                            <ToggleButton
+                                                onClick={handelToagelButton}
+                                                isChecked={toggleButton}
+                                            />
+
 
                                             <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-                                                <h2 className="text-xl font-bold text-gray-800 mb-4">Upload Excel File and Convert To JSON</h2>
-                                                <FileInputComp onChange={excelFileUpload} />
+                                                <h2 className="text-xl font-bold text-gray-800 mb-4"> {toggleButton ? "Upload Excel" : "Upload CSV "}File and Convert To JSON</h2>
+                                                <FileInputComp onChange={excelFileUpload} accept={toggleButton ? ".xlsx" : ".csv"} />
                                                 {jsondData && (
                                                     <div className="mt-6">
                                                         <TextAreaComp

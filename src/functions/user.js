@@ -9,8 +9,7 @@ const Auth_Status = "/api/auth/status";
 
 //Check Auth Status:
 export async function checkAuthStatus() {
-    return await server.get((getURL(Auth_Status)));
-
+    return await server.get(getURL(Auth_Status));
 }
 //register
 export async function postUser(data) {

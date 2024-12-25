@@ -8,10 +8,13 @@ const HoverDropdown = ({ isMcq = null, onclick, isShow = null, label, items, cla
 
 
     const router = useRouter();
-    const clicked = (topic, isMcq) => {
+    const clicked = (topic, topicName, isMcq) => {
 
         if (isMcq) {
-            router.push(`/ChapterWiseQuiz/${topic}`);
+            console.log("topic", topic);
+            // console.log("name", topicName)
+            // router.push(`/ChapterWiseQuiz/${topic}&topicName=${topicName}`);
+            router.push(`/ChapterWiseQuiz/${encodeURIComponent(topic)}&topicName=${encodeURIComponent(topicName)}`);
 
         } else {
             router.push(`/ChapterWiseSubjective/${topic}`);
@@ -28,7 +31,7 @@ const HoverDropdown = ({ isMcq = null, onclick, isShow = null, label, items, cla
                     {items.map((item, index) => (
 
                         <div key={index} className='px-4 py=2'>
-                            <div onClick={() => clicked(item.id, isMcq)} className='font-semibold cursor-pointer hover:bg-gray-100 rounded-md px-2 py-1'>
+                            <div onClick={() => clicked(item.id, item.categoryName, isMcq)} className='font-semibold cursor-pointer hover:bg-gray-100 rounded-md px-2 py-1'>
                                 {item.categoryName}
                             </div>
                             {item.subItems && (

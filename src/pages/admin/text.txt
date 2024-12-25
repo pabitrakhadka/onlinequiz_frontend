@@ -1,0 +1,91 @@
+1.How many ways you can save a document? 
+a.3 
+b.4 
+c.5 
+d.6
+category:Word Processing
+descriptin:dfd
+2.What is the maximum number of lines you can set for lines to drop box? 
+a.3 
+b.5 
+c.10 
+d.15 
+category:Word Processing
+descriptin:dfd
+3.Single spacing in MS-WORD document causes ____ point line spacing? 
+a.10 
+b.12 
+c.14 
+d.16
+category:Word Processing
+descriptin:dfd
+4.What is the default number of lines to drop for drop cap 
+a.3 
+b.10 
+c.15 
+d.20
+category:Word Processing
+descriptin:dfd 
+5.What is the maximum number of lines you can set for a drop cap? 
+a.3 
+b.10 
+c.15 
+d.20
+category:Word Processing
+descriptin:dfd 
+6.How many columns can you insert in a word document in maximum? 
+a.35 
+b.45 
+c.55 
+d.65
+category:Word Processing
+descriptin:dfd 
+7.In a document what is the maximum number of columns that can be inserted in MS Word Table? a. 35 
+b.15 
+c.63 
+d.65
+category:Word Processing
+descriptin:dfd 
+8.What is the maximum scale percentage available in Scale drop down box? 
+a.500 
+b.200 
+c.100 
+d.90 
+category:Word Processing
+descriptin:dfd
+9.What is the maximum font size you can apply for any character 
+a.163 
+b.1638 
+c.16038 
+d.None of above
+category:Word Processing
+descriptin:dfd 
+10.Word, by default, places a tab stop at every _____ mark on the ruler. 
+a..25" 
+b..5" 
+c..75" 
+d.1"
+category:Word Processing
+descriptin:dfd 
+11.What is the default file extension for all Word documents? 
+a..txts 
+b..word 
+c..docs 
+d..docx
+category:Word Processing
+descriptin:dfd 
+12.The file type _____ indicates the file is a Word document. 
+a..msw 
+b..doc 
+c..wor 
+d..wrd 
+category:Word Processing
+descriptin:dfd
+13.With Word’s AutoCorrect entries, to display an indifferent face 
+( :| ) type _____. 
+a.:) 
+b.:( 
+c.:| 
+d.:/ 
+category:Word Processing
+descriptin:dfddfd

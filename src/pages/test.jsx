@@ -1,35 +1,29 @@
 import React, { useState } from 'react';
-import Timer from '@/Components/User/Timer';
+import { Button } from '@mui/material';
+import StatusMessage from '@/Components/StatusMessage';
 
 const App = () => {
-    const [stopTime, setStopTime] = useState(false);
-    const [remainingTime, setRemainingTime] = useState(0);
+    const [statusCode, setStatusCode] = useState(null);
+    const [open, setOpen] = useState(false);
 
-    const handleTimeChange = (time) => {
-
-
-        const actualtime = (1 * 60) - time
-        console.log("this is functions", actualtime);
-        setRemainingTime(actualtime);
+    const handleButtonClick = (code) => {
+        setStatusCode(code);
+        setOpen(true);
     };
 
-    const handleStopTime = () => {
-        console.log(remainingTime);
-        setStopTime(true);
+    const handleClose = () => {
+        setOpen(false);
     };
 
     return (
-        <div>
-            <Timer
-                initialMinutes={1}
-                onTimeChange={handleTimeChange}
-                stopTime={stopTime}
-            />
-            <div>
-                <p>Is Time Over: {remainingTime <= 0 ? 'Yes' : 'No'}</p>
-                <p>Remaining Time in Seconds: {remainingTime}</p>
-                <button onClick={handleStopTime}>Stop Time</button>
-            </div>
+        <div style={{ textAlign: 'center', marginTop: '50px' }}>
+            <Button variant="contained" color="primary" onClick={() => handleButtonClick(200)}>Show Success</Button>
+            <Button variant="contained" color="secondary" onClick={() => handleButtonClick(400)}>Show Warning</Button>
+            <Button variant="contained" color="error" onClick={() => handleButtonClick(401)}>Show Unauthorized</Button>
+            <Button variant="contained" color="error" onClick={() => handleButtonClick(403)}>Show Forbidden</Button>
+            <Button variant="contained" color="info" onClick={() => handleButtonClick(404)}>Show Info</Button>
+            <Button variant="contained" color="error" onClick={() => handleButtonClick(500)}>Show Error</Button>
+            <StatusMessage statusCode={statusCode} open={open} onClose={handleClose} />
         </div>
     );
 };

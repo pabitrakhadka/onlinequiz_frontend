@@ -25,7 +25,8 @@ const sets = () => {
             const res = await getCategories(`category=select_set`);
             if (res.status === 200) {
                 setSets(res.data.data);
-                console.log(res.data.data);
+                console.log(res.data);
+
                 setLoading(false);
             }
         } catch (error) {

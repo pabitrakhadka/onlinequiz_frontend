@@ -1,31 +1,31 @@
 import ButtonComp from '@/Components/ButtonComp';
 import Layout from '@/Components/Layout';
-// import Loders from '@/Components/Loders';
 import OptionComp from '@/Components/OptionComp';
 import Question from '@/Components/Question';
-import { getQuiz } from '@/functions/quiz';
+import { getCategoryWiseQuestion, getQuiz } from '@/functions/quiz';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Spinner from '@/Components/Spinner';
+
 const Loders = dynamic(() => import('@/Components/Loders'), { ssr: false });
+
 const Quiz = () => {
     const router = useRouter();
     const { topic } = router.query;
+
     const [questions, setQuestions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState({});
     const optionLabel = ['A).', 'B).', 'C).', 'D).'];
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const pageSize = 5;
-
     const [loading, setLoading] = useState(false);
-    const changePage = () => {
 
-    }
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
+
     useEffect(() => {
         if (topic) {
             loadQuestion(currentPage);
@@ -34,15 +34,18 @@ const Quiz = () => {
 
     const loadQuestion = async (page) => {
         try {
-            const questions = await getQuiz(`page=${page}&limit=${pageSize}&category=${topic}`);
+            setLoading(true);
+            const questions = await getCategoryWiseQuestion(`page=${page}&limit=${pageSize}&categoryId=9&topicName=${topic}`);
             if (questions.status === 200) {
                 setQuestions(questions.data.data);
-                setTotalPages(questions.data.totalPages)
-                setLoading(true);
+                setTotalPages(questions.data.totalPages);
+                console.log(questions.data.data);
+                // setLoading(false)
             }
         } catch (error) {
             console.log("Error fetching question", error);
-
+        } finally {
+            // setLoading(false);
         }
     };
 
@@ -56,45 +59,49 @@ const Quiz = () => {
 
     return (
         <Layout>
-            <div className='min-h-screen bg-gray-50 p-4 lg:p-5'>
-                <h1 className='text-4xl font-bold text-blue-800 text-center mb-2'>{topic ? `Quiz for ${topic}` : 'Loading...'}</h1>
-                {loading ? <><div className=' max-w-2xl bg-white rounded-lg shadow-lg p-6 space-y-6  m-auto'>
-                    <div>
-                        {questions.map((question, questionIndex) => (
-                            <div key={questionIndex}>
-                                <Question question={`${questionIndex + 1}. ${question.question}`} />
+            {topic ? (
+                <div className='min-h-screen bg-gray-50 p-4 lg:p-5'>
+                    <h1 className='text-4xl font-bold text-blue-800 text-center mb-2'>{topic ? `Quiz for ${topic}` : 'Loading...'}</h1>
+                    {loading ? (
+                        <div className=' max-w-2xl bg-white rounded-lg shadow-lg p-6 space-y-6 m-auto'>
+                            <div>
+                                {questions.map((question, questionIndex) => (
+                                    <div key={questionIndex}>
+                                        <Question question={`${questionIndex + 1}. ${question.question}`} />
+                                        {question.options.map((option, index) => {
+                                            const selectedOption = selectedOptions[questionIndex];
+                                            const isSelected = selectedOption?.selected === option.text;
+                                            const isCorrect = isSelected && selectedOption?.isCorrect;
 
-                                {question.options.map((option, index) => {
-                                    const selectedOption = selectedOptions[questionIndex];
-                                    const isSelected = selectedOption?.selected === option.text;
-                                    const isCorrect = isSelected && selectedOption?.isCorrect;
-
-                                    return (
-                                        <OptionComp
-                                            key={index}
-                                            keyProp={index}
-                                            value={option.text}
-                                            checked={isSelected}
-                                            isCorrect={isCorrect}
-                                            onChange={() => handleOptionChange(option.text, question.answer, questionIndex)}
-                                        />
-                                    );
-                                })}
+                                            return (
+                                                <OptionComp
+                                                    key={index}
+                                                    keyProp={index}
+                                                    value={option.text}
+                                                    checked={isSelected}
+                                                    isCorrect={isCorrect}
+                                                    onChange={() => handleOptionChange(option.text, question.answer, questionIndex)}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                </div></> : <>
-                    <div className='text-center'>
-
-                        <Loders />
-                    </div>
-                </>}
-                <Pagination currentPage={1} onPageChange={handlePageChange} totalPages={5} />
-
-            </div>
+                        </div>
+                    ) : (
+                        <div className='text-center'>
+                            <Loders />
+                        </div>
+                    )}
+                    <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={totalPages} />
+                </div>
+            ) : (
+                <></>
+            )}
         </Layout>
     );
 };
+
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
@@ -115,7 +122,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 </button>
             ))}
         </div>
-
     );
-}
+};
+
 export default Quiz;

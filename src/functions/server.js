@@ -1,7 +1,9 @@
 import axios from "axios"
 class Server {
     constructor() {
-        this.header = {}
+
+        this.header = {};
+        axios.defaults.withCredentials = true;
     }
     post(path, data) {
         return axios.post(path, data, { withCredentials: true }, {
@@ -10,7 +12,8 @@ class Server {
     }
     get(path, data) {
         return axios.get(path, data, {
-            headers: this.header
+            headers: this.header,
+
         })
     }
     put(path, data) {

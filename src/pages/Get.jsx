@@ -1,51 +1,36 @@
-
 import ButtonComp from "@/Components/ButtonComp";
-import { getLocalStorage } from "@/services/localStorage";
-import React from "react";
-import { useState } from "react";
+import UserAuthContext from "@/Context/context";
+import React, { useContext } from "react";
 import { useEffect } from "react";
 
-
 const Get = () => {
-    const [isLoad, setIsLoad] = useState(false);
-    const [user, setUser] = useState(null);
-    const loaddata = () => {
-        const isData = getLocalStorage('userData');
-        if (isData) {
-            setUser(getLocalStorage('userData'));
-            setIsLoad(true);
-        } else {
-            setIsLoad(false);
-        }
-
+    const { user, loading, logout } = useContext(UserAuthContext)
+    if (loading) {
+        return <p>Loading...</p>;  // Show loading state while the authentication status is being checked
     }
-    useEffect(() => {
-        loaddata();
-        if (!isLoad) {
-            loaddata();
-            console.log('data', user);
-        }
 
-    }, [])
+    if (!user) {
+        return <p>Please log in to access this page.</p>;  // Show this message if no user is authenticated
+    }
 
 
     return (
         <div>
-            {isLoad ? <>
+            {user ? (
                 <div>
                     <div>
-                        <p>Id:{user.id}</p>
-                        <p>Name:{user.Name}</p>
-                        <p>Email:{user.email}</p>
-                        <p>AccessToken:{user.accessToken}</p>
-                        <p>RefreshToken:{user.refreshToken}</p>
+                        <p>Id: {user.id}</p>
+                        <p>Name: {user.name}</p>
+                        <p>Email: {user.email}</p>
 
                     </div>
-                    <ButtonComp name={"Logout"} />
+                    <ButtonComp name={"Logout"} onClick={logout} />
                 </div>
-            </> : <>
-                <div><ButtonComp name={"Login In"} /></div>
-            </>}
+            ) : (
+                <div>
+                    <ButtonComp name={"Login"} onClick={() => router.push("/login")} />
+                </div>
+            )}
         </div>
     );
 };

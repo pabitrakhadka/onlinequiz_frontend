@@ -12,7 +12,7 @@ export async function postSlug(data) {
 // GET API
 export async function getSlugs(params) {
 
-    return await server.get(getURL(`${Slug_API}?id=${params}`));
+    return await server.get(getURL(`${Slug_API}?${params}`));
 }
 
 // PUT API

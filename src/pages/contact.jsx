@@ -52,59 +52,28 @@ const contact = () => {
     })
     return (
         <Layout>
-            <div className='w-full h-screen bg-blue-500'>
-                <div className=" h-screen flex flex-col lg:flex-row justify-evenly items-center p-6 space-y-4 lg:space-y-0 lg:space-x-4">
-                    <div className="text-center lg:text-left bg-gray-100 p-5 w-1/3 ">
-                        <div>
-                            <h1 className='text-center font-bold text-4xl'>Contact Us</h1>
-                            <form onSubmit={handleSubmit}>
-                                <div className='flex justify-around'>
-                                    <div>
-                                        <InputComp name={'firstName'} onBlur={handleBlur} onChange={handleChange} value={values.firstName} label={"First Name"} />
-                                        {errors.firstName && touched.firstName ? (
-                                            <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
-                                        ) : null}
-                                    </div>
-                                    <div>
-                                        <InputComp name={'lastName'} label={"Last Name"} onBlur={handleBlur} onChange={handleChange} value={values.lastName} />
-                                        {errors.lastName && touched.lastName ? (
-                                            <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
-                                        ) : null}
-                                    </div>
-                                </div>
-                                <div>
-                                    <InputComp name={'email'} label={"Email"} onBlur={handleBlur} onChange={handleChange} value={values.email} />
-                                    {errors.email && touched.email ? (
-                                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                                    ) : null}
-                                </div>
-                                <div>
-                                    <TextAreaComp
-                                        name="message"
-                                        label="Message"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        value={values.message}
-                                    />
-                                    {errors.message && touched.message && (
-                                        <p className="text-red-500 text-sm mt-1">{errors.message}</p>
-                                    )}
-
-                                </div>
-                                <div className='text-center'>
-                                    <ButtonComp name='Submit' type={'submit'} />
-                                </div>
-                            </form>
+            <div className='w-full min-h-screen bg-blue-500 flex items-center justify-center'>
+                <div className="flex flex-col lg:flex-row justify-evenly items-center p-6 space-y-4 lg:space-y-0 lg:space-x-4 w-full max-w-5xl">
+                    <div className="text-center lg:text-left bg-gray-100 p-5 w-full lg:w-1/2 rounded-sm">
+                        <h1 className='text-center font-bold text-2xl sm:text-3xl md:text-4xl mb-4'>Contact Us</h1>
+                        <form onSubmit={handleSubmit}> <div className='flex flex-col sm:flex-row justify-around'>
+                            <div className='w-full sm:w-1/2 p-2'>
+                                <InputComp name={'firstName'} onBlur={handleBlur} onChange={handleChange} value={values.firstName} label={"First Name"} />
+                                {errors.firstName && touched.firstName ?
+                                    (<p className="text-red-500 text-sm mt-1">{errors.firstName}</p>) : null}
+                            </div>
+                            <div className='w-full sm:w-1/2 p-2'> <InputComp name={'lastName'} label={"Last Name"} onBlur={handleBlur} onChange={handleChange} value={values.lastName} />
+                                {errors.lastName && touched.lastName ? (<p className="text-red-500 text-sm mt-1">{errors.lastName}</p>) : null}
+                            </div>
                         </div>
-
-
-                    </div>
-                    <div>
-                        <img className="w-full h-auto max-w-md" src="./quizbanner.png" alt="Quiz Banner" />
+                            <div className='p-2'> <InputComp name={'email'} label={"Email"} onBlur={handleBlur} onChange={handleChange} value={values.email} /> {errors.email && touched.email ? (<p className="text-red-500 text-sm mt-1">{errors.email}</p>) : null}
+                            </div>
+                            <div className='p-2'> <TextAreaComp name="message" label="Message" onBlur={handleBlur} onChange={handleChange} value={values.message} /> {errors.message && touched.message && (<p className="text-red-500 text-sm mt-1">{errors.message}</p>)} </div> <div className='text-center p-2'> <ButtonComp name='Submit' type={'submit'} />
+                            </div>
+                        </form> </div> <div className='w-full lg:w-1/2 flex justify-center'> <img className="w-full h-auto max-w-md rounded-md" src="./quizbanner.png" alt="Quiz Banner" />
                     </div>
                 </div>
-            </div>
-        </Layout>
+            </div> </Layout>
     )
 }
 

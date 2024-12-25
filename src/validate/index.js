@@ -60,17 +60,23 @@ const loginSchema = Yup.object().shape({
         .required("Password is required"),
 });
 //Quiz Schema
+const categoryIdValidate = () => {
+    return Yup.number()
+        .typeError('Category ID must be a number') // Error if value is not a number
+        .required('Category ID is required');
+};
+
 const quizSchema = Yup.object().shape({
     question: Yup.string().required("Required"),
     options: Yup.array().of(Yup.string().required("Required")).length(4, "There should be exactly 4 options"),
     answer: Yup.string().required("Required"),
-    categoryId: Yup.number().required("Required"),
+    categoryId: categoryIdValidate(),
     description: Yup.string().nullable(),
 });
 //Subjective Question Schema
 const subjectiveQuestionSchema = Yup.object().shape({
     question: Yup.string().required("Required"),
-    categoryId: Yup.number().required("Required"),
+    categoryId: categoryIdValidate(),
     category: Yup.number().required("Required"),
 });
 const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/png", "image/gif"];
@@ -111,12 +117,7 @@ const pdfValidationSchema = Yup.object().shape({
             "File size must be less than 5MB.",
             (value) => value && value.size <= FILE_SIZE_LIMIT
         ),
-    categoryId: Yup.mixed()
-        .test("is-number-or-numeric-string", "Must be a number or numeric string", (value) => {
-            if (value === undefined || value === null) return false; // Required check
-            return !isNaN(Number(value)); // Checks if the value is a valid number or numeric string
-        })
-        .required("Required"),
+    categoryId: categoryIdValidate()
 });
 
 //contact Schema
